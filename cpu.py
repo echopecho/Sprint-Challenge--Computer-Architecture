@@ -40,7 +40,7 @@ class CPU:
             for line in file:
                 line_list = line.split("#")
                 binary_str = line_list[0].strip()
-                if "0" in binary_str and "1" in binary_str:
+                if "0" in binary_str or "1" in binary_str:
                     binary = int(binary_str, 2)
                     program.append(binary)
 
@@ -143,13 +143,35 @@ class CPU:
                 self.reg[7] += 1
 
                 pc += 2
-            
+
             elif cmd == self.CMP:
                 registerA = self.ram_read(self.ram[pc + 1])
                 registerB = self.ram_read(self.ram[pc + 2])
 
-                self.FL[self.flags["E"]] = 1 registerA == registerB else 0
-                self.FL[self.flags["L"]] = 1 registerA < registerB else 0
-                self.FL[self.flags["G"]] = 1 registerA > registerB else 0
+                self.FL[self.flags["E"]] = 1 if registerA == registerB else 0
+                self.FL[self.flags["L"]] = 1 if registerA < registerB else 0
+                self.FL[self.flags["G"]] = 1 if registerA > registerB else 0
 
                 pc += 3
+
+            elif cmd == self.JMP:
+                value = self.ram_read(self.ram[pc + 1])
+
+                pc = value
+
+            elif cmd == self.JEQ:
+                value = self.ram_read(self.ram[pc + 1])
+
+                if self.FL[self.flags["E"]] == 1:
+                    pc = value
+                else:
+                    pc += 2
+
+            elif cmd == self.JNE:
+                value = self.ram_read(self.ram[pc + 1])
+
+                if self.FL[self.flags["E"]] != 1:
+                    pc = value
+                else:
+                    pc += 2
+
